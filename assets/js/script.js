@@ -36,7 +36,6 @@ var taskFormHandler = function (event) {
       // because this gets sent to createTaskEl the task will always have a status of to do since a newly created task can't be "in progress" or "completed"
       status: 'to do'
     }
-    // send it as an argument to createTaskEl
     createTaskEl(taskDataObj)
   }
 }
@@ -55,9 +54,10 @@ var completeEditTask = function (taskName, taskType, taskId) {
     }
   }
 
+  saveTasks()
+
   alert('Task Updated!')
 
-  // reset the form by removing the task id and changing the button text back to normal
   formEl.removeAttribute('data-task-id')
   document.querySelector('#save-task').textContent = 'Add Task'
 }
@@ -88,13 +88,13 @@ var createTaskEl = function (taskDataObj) {
 
   tasks.push(taskDataObj)
 
-  // increase task counter for next unique id
+  saveTasks()
+
   taskIdCounter++
 }
 
 // parameter of taskId is how we pass a different id to the fxn to keep track of which elements we're creating for which task
 var createTaskActions = function (taskId) {
-  // create a new div that will contain the new task action elements
   var actionContainerEl = document.createElement('div')
   actionContainerEl.className = 'task-actions'
 
@@ -138,8 +138,6 @@ var createTaskActions = function (taskId) {
   return actionContainerEl
 }
 
-formEl.addEventListener('submit', taskFormHandler)
-
 var taskButtonHandler = function (event) {
   var targetEl = event.target
 
@@ -156,8 +154,6 @@ var taskButtonHandler = function (event) {
   }
 }
 
-pageContentEl.addEventListener('click', taskButtonHandler)
-
 var deleteTask = function (taskId) {
   var taskSelected = document.querySelector('.task-item[data-task-id=\'' + taskId + '\']')
   taskSelected.remove()
@@ -170,6 +166,8 @@ var deleteTask = function (taskId) {
   }
 
   tasks = updatedTaskArray
+
+  saveTasks()
 }
 
 var editTask = function (taskId) {
@@ -213,6 +211,13 @@ var taskStatusChangeHandler = function (event) {
       tasks[i].status = statusValue
     }
   }
+  saveTasks()
 }
 
+var saveTasks = function () {
+  localStorage.setItem('tasks', JSON.stringify(tasks))
+}
+
+formEl.addEventListener('submit', taskFormHandler)
+pageContentEl.addEventListener('click', taskButtonHandler)
 pageContentEl.addEventListener('change', taskStatusChangeHandler)
